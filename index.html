@@ -16,8 +16,6 @@
 <style>
 /* ============================================================
    VEXA — Pastel Glassmorphism redesign
-   Визуальная тема: нежно-розовый / лаванда / персиковый / молочный
-   Функционал не тронут — только оформление.
    ============================================================ */
 :root{
   --accent:#8B5CF6;--accent2:#A78BFA;--accent3:#C4B5FD;
@@ -50,10 +48,8 @@
   --glass-shadow:0 10px 40px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.06) inset;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-/* ИСПРАВЛЕНИЕ №1 (белая полоса снизу): добавляем фоновый цвет на html как fallback */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:pan-x pan-y;height:100%;background-color:#F6EEF8}
 [data-theme="dark"] html{background-color:#120B22}
-/* ИСПРАВЛЕНИЕ №1: background-attachment fixed → scroll, чтобы фон покрывал нижнюю safe-area */
 body{
   height:100%;font:var(--font);color:var(--text);overflow:hidden;
   touch-action:pan-x pan-y;overscroll-behavior:none;
@@ -144,24 +140,8 @@ svg{display:block}
 /* ============ APP ============ */
 #app{flex-direction:column;background:transparent}
 #app.active{display:flex}
-
-/* --- НОВАЯ ШАПКА: крупный заголовок + круглые кнопки (как в референсе) --- */
-.app-header{
-  position:relative;z-index:20;
-  display:flex;align-items:center;gap:10px;
-  padding:max(16px,env(safe-area-inset-top)) 20px 12px;
-  background:transparent;
-  border-bottom:0;
-}
-.app-title{
-  font-size:32px;
-  font-weight:800;
-  letter-spacing:-.8px;
-  color:var(--text);
-  line-height:1.1;
-  margin:0;
-  flex-shrink:0;
-}
+.app-header{position:relative;z-index:20;display:flex;align-items:center;gap:10px;padding:max(16px,env(safe-area-inset-top)) 20px 12px;background:transparent;border-bottom:0}
+.app-title{font-size:32px;font-weight:800;letter-spacing:-.8px;color:var(--text);line-height:1.1;margin:0;flex-shrink:0}
 [data-theme="dark"] .app-title{color:var(--text)}
 .logo-mini{width:38px;height:38px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;flex-shrink:0;box-shadow:0 8px 22px rgba(139,92,246,.4)}
 .brand-mini{font-weight:800;letter-spacing:3.5px;font-size:16px;margin-left:4px}
@@ -171,19 +151,13 @@ svg{display:block}
 .panel.active{display:flex;animation:panelIn .32s cubic-bezier(.2,.9,.3,1)}
 @keyframes panelIn{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
 
-/* --- НОВАЯ СТРОКА ПОИСКА в панели чатов (как в референсе) --- */
 .chats-search{padding:0 16px 4px;flex-shrink:0}
 .chats-search .search-box{margin-bottom:6px;background:rgba(255,255,255,.78);cursor:pointer;padding:12px 16px}
 .chats-search .search-box input{cursor:pointer}
 .chats-search .search-box input::placeholder{color:var(--text2)}
 [data-theme="dark"] .chats-search .search-box{background:rgba(40,30,65,.55)}
 
-#panel-me{
-  overflow-y:auto !important;
-  overflow-x:hidden !important;
-  padding-bottom:calc(240px + env(safe-area-inset-bottom)) !important;
-  -webkit-overflow-scrolling:touch;
-}
+#panel-me{overflow-y:auto !important;overflow-x:hidden !important;padding-bottom:calc(240px + env(safe-area-inset-bottom)) !important;-webkit-overflow-scrolling:touch}
 #panel-me > *{flex-shrink:0 !important}
 #panel-me::-webkit-scrollbar{width:0}
 
@@ -198,18 +172,7 @@ svg{display:block}
 .list{flex:1;overflow-y:auto;padding:0 8px 20px;scroll-behavior:smooth}
 .list::-webkit-scrollbar{width:0}
 
-/* ============ ЧАТ-КАРТОЧКИ (как на референсе: белые, мягкие, скруглённые) ============ */
-.chat-row{
-  display:flex;gap:14px;padding:12px 16px;margin:5px 8px;
-  cursor:pointer;align-items:center;position:relative;
-  background:rgba(255,255,255,.78);
-  -webkit-backdrop-filter:blur(28px) saturate(180%);
-  backdrop-filter:blur(28px) saturate(180%);
-  border:1px solid rgba(255,255,255,.95);
-  border-radius:30px;
-  box-shadow:0 6px 20px rgba(140,90,200,.08), 0 1px 0 rgba(255,255,255,.7) inset;
-  transition:transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .2s, background .2s;
-}
+.chat-row{display:flex;gap:14px;padding:12px 16px;margin:5px 8px;cursor:pointer;align-items:center;position:relative;background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(28px) saturate(180%);backdrop-filter:blur(28px) saturate(180%);border:1px solid rgba(255,255,255,.95);border-radius:30px;box-shadow:0 6px 20px rgba(140,90,200,.08), 0 1px 0 rgba(255,255,255,.7) inset;transition:transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .2s, background .2s}
 .chat-row:hover{background:rgba(255,255,255,.92);box-shadow:0 10px 28px rgba(140,90,200,.14)}
 .chat-row:active{transform:scale(.985);background:rgba(255,255,255,.95)}
 [data-theme="dark"] .chat-row{background:rgba(40,30,65,.55);border-color:rgba(255,255,255,.06)}
@@ -222,19 +185,7 @@ svg{display:block}
 .chat-preview{color:var(--text2);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px}
 .chat-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;min-width:44px}
 .chat-time{font-size:11.5px;color:var(--text2);font-weight:500}
-/* --- ЧЁРНЫЕ БЕЙДЖИ (как в референсе) --- */
-.badge{
-  background:#1C1533;
-  color:#fff;
-  font-size:11.5px;
-  font-weight:700;
-  padding:4px 10px;
-  border-radius:14px;
-  min-width:24px;
-  text-align:center;
-  box-shadow:0 4px 12px rgba(0,0,0,.20);
-  letter-spacing:.2px;
-}
+.badge{background:#1C1533;color:#fff;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:14px;min-width:24px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.20);letter-spacing:.2px}
 .badge.muted{background:var(--text2);box-shadow:none}
 [data-theme="dark"] .badge{background:#EFE9FA;color:#1C1533}
 
@@ -248,7 +199,6 @@ svg{display:block}
 .p-item:active{transform:scale(.985);background:rgba(255,255,255,.9)}
 .p-item::after{display:none}
 
-/* ============ ME-ПАНЕЛЬ ============ */
 .me-hero{margin:14px 16px;padding:28px 24px;border-radius:32px;display:flex;flex-direction:column;align-items:center;gap:16px;background:linear-gradient(135deg,rgba(139,92,246,.28),rgba(196,181,253,.16) 60%,rgba(255,190,215,.18));-webkit-backdrop-filter:blur(34px) saturate(190%);backdrop-filter:blur(34px) saturate(190%);border:1px solid rgba(255,255,255,.75);box-shadow:0 20px 50px rgba(140,90,200,.18), 0 1px 0 rgba(255,255,255,.7) inset;cursor:pointer;transition:transform .2s cubic-bezier(.2,.9,.3,1)}
 .me-hero:active{transform:scale(.98)}
 .me-name{font-size:23px;font-weight:700;letter-spacing:-.4px}
@@ -261,66 +211,21 @@ svg{display:block}
 .me-menu button.danger{color:var(--danger)}
 .me-menu button.danger svg{color:var(--danger)}
 
-/* ============ НИЖНЯЯ НАВИГАЦИЯ ============ */
-.bottom-nav{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:calc(16px + env(safe-area-inset-bottom));
-  display:flex;gap:2px;padding:7px;border-radius:999px;z-index:40;
-  background:var(--glass-bg);
-  -webkit-backdrop-filter:blur(40px) saturate(200%);
-  backdrop-filter:blur(40px) saturate(200%);
-  border:1px solid var(--glass-border);
-  box-shadow:0 16px 44px rgba(140,90,200,.22), 0 1px 0 rgba(255,255,255,.75) inset;
-  max-width:calc(100vw - 32px);
-  touch-action:none;user-select:none;
-  transition:box-shadow .3s;
-}
+.bottom-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));display:flex;gap:2px;padding:7px;border-radius:999px;z-index:40;background:var(--glass-bg);-webkit-backdrop-filter:blur(40px) saturate(200%);backdrop-filter:blur(40px) saturate(200%);border:1px solid var(--glass-border);box-shadow:0 16px 44px rgba(140,90,200,.22), 0 1px 0 rgba(255,255,255,.75) inset;max-width:calc(100vw - 32px);touch-action:none;user-select:none;transition:box-shadow .3s}
 .bottom-nav.dragging{box-shadow:0 20px 54px rgba(139,92,246,.42), 0 1px 0 rgba(255,255,255,.75) inset}
-.nav-indicator{
-  position:absolute;top:7px;bottom:7px;left:0;
-  border-radius:999px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  box-shadow:0 10px 24px rgba(139,92,246,.5), 0 1px 0 rgba(255,255,255,.4) inset;
-  pointer-events:none;z-index:0;
-  transition:left .32s cubic-bezier(.2,.9,.3,1), width .32s cubic-bezier(.2,.9,.3,1);
-  will-change:left,width;
-}
+.nav-indicator{position:absolute;top:7px;bottom:7px;left:0;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 10px 24px rgba(139,92,246,.5), 0 1px 0 rgba(255,255,255,.4) inset;pointer-events:none;z-index:0;transition:left .32s cubic-bezier(.2,.9,.3,1), width .32s cubic-bezier(.2,.9,.3,1);will-change:left,width}
 .bottom-nav.dragging .nav-indicator{transition:none}
-.bottom-nav button{
-  position:relative;z-index:1;
-  display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:9px 18px;border-radius:999px;
-  font-size:10.5px;font-weight:600;letter-spacing:.3px;
-  color:var(--text2);
-  transition:color .25s;
-  white-space:nowrap;
-}
+.bottom-nav button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 18px;border-radius:999px;font-size:10.5px;font-weight:600;letter-spacing:.3px;color:var(--text2);transition:color .25s;white-space:nowrap}
 .bottom-nav button svg{width:22px;height:22px;stroke-width:2;transition:transform .3s cubic-bezier(.2,.9,.3,1)}
 .bottom-nav button.on{color:#fff}
 .bottom-nav button.on svg{transform:scale(1.08)}
 
-/* ============ СТРАНИЦЫ ============ */
-.page{
-  position:fixed;inset:0;z-index:70;
-  background:linear-gradient(160deg,#FBF3FB 0%,#F3ECFB 40%,#FDF1EE 100%);
-  display:flex;flex-direction:column;
-  transform:translateX(100%);
-  transition:transform .38s cubic-bezier(.2,.9,.3,1);
-  will-change:transform;
-  box-shadow:-16px 0 44px rgba(140,90,200,.18);
-  touch-action:pan-y;
-}
+.page{position:fixed;inset:0;z-index:70;background:linear-gradient(160deg,#FBF3FB 0%,#F3ECFB 40%,#FDF1EE 100%);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .38s cubic-bezier(.2,.9,.3,1);will-change:transform;box-shadow:-16px 0 44px rgba(140,90,200,.18);touch-action:pan-y}
 [data-theme="dark"] .page{background:linear-gradient(160deg,#0E0820,#120B22 50%,#160A1C)}
 .page.open{transform:translateX(0)}
 .page.dragging{transition:none}
 .page.dark-glass{background:var(--bg)}
-.page-header{
-  display:flex;align-items:center;gap:10px;
-  padding:max(12px,env(safe-area-inset-top)) 16px 12px;
-  background:transparent;
-  border-bottom:0;
-  position:relative;
-}
+.page-header{display:flex;align-items:center;gap:10px;padding:max(12px,env(safe-area-inset-top)) 16px 12px;background:transparent;border-bottom:0;position:relative}
 .page-header h2{font-size:17px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
 .page-body{flex:1;overflow-y:auto;padding:8px 0 40px}
 .page-body::-webkit-scrollbar{width:0}
@@ -352,38 +257,10 @@ svg{display:block}
 .set-row svg{color:var(--text2);flex-shrink:0}
 .set-row .val{margin-left:auto;color:var(--text2);font-size:13.5px;max-width:55%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ============ CHAT OVERLAY ============
-   ИСПРАВЛЕНИЕ АНИМАЦИИ:
-   - открытие: справа-налево (translateX(100%) → 0)
-   - закрытие: слева-направо (0 → translateX(100%))
-   Используем visibility вместо display:none, чтобы transition срабатывал в обе стороны.
-   ============================================================ */
-.chat-overlay{
-  position:fixed;inset:0;z-index:55;
-  background:
-    radial-gradient(circle at 12% 4%, rgba(255,190,215,.45) 0%, transparent 42%),
-    radial-gradient(circle at 88% 8%, rgba(200,180,255,.45) 0%, transparent 45%),
-    radial-gradient(circle at 78% 96%, rgba(255,215,190,.4) 0%, transparent 45%),
-    linear-gradient(160deg,#FBF3FB 0%,#F3ECFB 40%,#FDF1EE 100%);
-  display:flex;flex-direction:column;
-  transform:translateX(100%);
-  visibility:hidden;
-  pointer-events:none;
-  transition:transform .38s cubic-bezier(.2,.9,.3,1), visibility 0s linear .38s;
-  will-change:transform;
-}
-[data-theme="dark"] .chat-overlay{
-  background:
-    radial-gradient(circle at 12% 4%, rgba(140,80,180,.3) 0%, transparent 42%),
-    radial-gradient(circle at 88% 8%, rgba(120,90,220,.3) 0%, transparent 45%),
-    linear-gradient(160deg,#0E0820 0%,#120B22 50%,#160A1C 100%);
-}
-.chat-overlay.open{
-  transform:translateX(0);
-  visibility:visible;
-  pointer-events:auto;
-  transition:transform .38s cubic-bezier(.2,.9,.3,1), visibility 0s linear 0s;
-}
+/* ============ CHAT OVERLAY ============ */
+.chat-overlay{position:fixed;inset:0;z-index:55;background:radial-gradient(circle at 12% 4%, rgba(255,190,215,.45) 0%, transparent 42%),radial-gradient(circle at 88% 8%, rgba(200,180,255,.45) 0%, transparent 45%),radial-gradient(circle at 78% 96%, rgba(255,215,190,.4) 0%, transparent 45%),linear-gradient(160deg,#FBF3FB 0%,#F3ECFB 40%,#FDF1EE 100%);display:flex;flex-direction:column;transform:translateX(100%);visibility:hidden;pointer-events:none;transition:transform .38s cubic-bezier(.2,.9,.3,1), visibility 0s linear .38s;will-change:transform}
+[data-theme="dark"] .chat-overlay{background:radial-gradient(circle at 12% 4%, rgba(140,80,180,.3) 0%, transparent 42%),radial-gradient(circle at 88% 8%, rgba(120,90,220,.3) 0%, transparent 45%),linear-gradient(160deg,#0E0820 0%,#120B22 50%,#160A1C 100%)}
+.chat-overlay.open{transform:translateX(0);visibility:visible;pointer-events:auto;transition:transform .38s cubic-bezier(.2,.9,.3,1), visibility 0s linear 0s}
 .chat-overlay.dragging{transition:none}
 
 .chat-top{display:flex;align-items:center;gap:10px;padding:max(10px,env(safe-area-inset-top)) 14px 12px;background:transparent;border-bottom:0}
@@ -396,36 +273,15 @@ svg{display:block}
 .msgs::-webkit-scrollbar{width:0}
 .day-sep{align-self:center;font-size:11px;color:var(--text2);background:var(--glass-bg);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);padding:5px 14px;border-radius:14px;margin:12px 0;text-transform:uppercase;letter-spacing:.6px;font-weight:600;border:1px solid var(--glass-border)}
 
-/* ============ СООБЩЕНИЯ (как на референсе) ============ */
 .msg-wrap{position:relative;display:flex;align-self:flex-start;max-width:100%;transition:transform .3s cubic-bezier(.2,.9,.3,1)}
 .msg-wrap.me{align-self:flex-end}
 .msg-wrap.dragging{transition:none}
-.msg-wrap .reply-hint{
-  position:absolute;left:-44px;top:50%;transform:translateY(-50%) scale(.6);
-  width:36px;height:36px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
-  display:grid;place-items:center;
-  opacity:0;transition:opacity .2s,transform .3s cubic-bezier(.2,.9,.3,1);
-  pointer-events:none;box-shadow:0 8px 20px rgba(139,92,246,.4);
-}
+.msg-wrap .reply-hint{position:absolute;left:-44px;top:50%;transform:translateY(-50%) scale(.6);width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;display:grid;place-items:center;opacity:0;transition:opacity .2s,transform .3s cubic-bezier(.2,.9,.3,1);pointer-events:none;box-shadow:0 8px 20px rgba(139,92,246,.4)}
 .msg-wrap.pulled .reply-hint{opacity:1;transform:translateY(-50%) scale(1)}
 .msg-wrap.triggered .reply-hint{transform:translateY(-50%) scale(1.15)}
 
-.msg{
-  max-width:100%;padding:11px 15px;
-  border-radius:22px;
-  font-size:14.5px;line-height:1.45;word-wrap:break-word;position:relative;
-  background:var(--bubble-other);color:var(--text);
-  border:1px solid var(--glass-border);
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-  box-shadow:0 4px 16px rgba(140,90,200,.10);
-  transition:transform .18s cubic-bezier(.2,.9,.3,1),box-shadow .2s;
-}
-.msg.me{
-  background:var(--bubble-me);color:var(--bubble-me-text);border-color:transparent;
-  border-bottom-right-radius:8px;
-  box-shadow:0 8px 24px rgba(139,92,246,.32);
-}
+.msg{max-width:100%;padding:11px 15px;border-radius:22px;font-size:14.5px;line-height:1.45;word-wrap:break-word;position:relative;background:var(--bubble-other);color:var(--text);border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:0 4px 16px rgba(140,90,200,.10);transition:transform .18s cubic-bezier(.2,.9,.3,1),box-shadow .2s}
+.msg.me{background:var(--bubble-me);color:var(--bubble-me-text);border-color:transparent;border-bottom-right-radius:8px;box-shadow:0 8px 24px rgba(139,92,246,.32)}
 .msg:not(.me){border-bottom-left-radius:8px}
 .msg.pressing{transform:scale(1.04);box-shadow:0 14px 36px rgba(0,0,0,.22)}
 .msg .quote{font-size:12px;opacity:.85;border-left:2.5px solid currentColor;padding:4px 10px;margin-bottom:6px;border-radius:8px;background:rgba(255,255,255,.18)}
@@ -446,7 +302,6 @@ svg{display:block}
 .empty-chat h3{color:var(--text);font-size:18px;margin:16px 0 8px;font-weight:600}
 .empty-chat p{font-size:14px;max-width:300px}
 
-/* ============ COMPOSER ============ */
 .composer{padding:12px 14px;padding-bottom:max(12px,env(safe-area-inset-bottom));background:transparent;border-top:0}
 .reply-bar{display:none;align-items:center;gap:10px;padding:8px 14px;background:var(--glass-bg);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);border-radius:18px;margin-bottom:10px;font-size:13px;border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);animation:fs .2s}
 .reply-bar.on{display:flex}
@@ -459,7 +314,6 @@ svg{display:block}
 .side-btn{width:48px;height:48px;border-radius:50%;background:var(--glass-bg);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);display:grid;place-items:center;color:var(--text2);flex-shrink:0;border:1px solid var(--glass-border);box-shadow:0 4px 14px rgba(140,90,200,.10);transition:transform .15s,color .15s}
 .side-btn:active{transform:scale(.94);color:var(--text)}
 
-/* ============ SHEET / MODAL ============ */
 .sheet-bd{position:fixed;inset:0;background:rgba(60,30,90,.32);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);z-index:100;display:none;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom));animation:fs .2s ease}
 .sheet-bd.open{display:flex}
 .sheet{width:100%;max-width:480px;border-radius:32px;overflow:hidden;background:var(--glass-bg);-webkit-backdrop-filter:blur(40px) saturate(200%);backdrop-filter:blur(40px) saturate(200%);border:1px solid var(--glass-border);box-shadow:0 30px 90px rgba(80,40,140,.35), 0 1px 0 rgba(255,255,255,.6) inset;animation:slideUp .35s cubic-bezier(.2,.9,.3,1);max-height:80vh;overflow-y:auto}
@@ -519,6 +373,21 @@ svg{display:block}
 .edge-back-hint{position:fixed;left:0;top:0;bottom:0;width:22px;z-index:65;pointer-events:none}
 .edge-back-hint::after{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%) scaleY(0);width:4px;height:44px;border-radius:4px;background:var(--accent);transition:transform .2s}
 .edge-back-hint.active::after{transform:translateY(-50%) scaleY(1)}
+
+/* ============ AVATAR CROPPER (НОВОЕ) ============ */
+.cropper-bd{position:fixed;inset:0;background:rgba(10,5,20,.92);z-index:400;display:none;align-items:center;justify-content:center;padding:20px;animation:fs .2s}
+.cropper-bd.open{display:flex}
+.cropper{width:100%;max-width:360px;padding:22px;border-radius:28px;background:var(--glass-bg);-webkit-backdrop-filter:blur(40px) saturate(200%);backdrop-filter:blur(40px) saturate(200%);border:1px solid var(--glass-border);box-shadow:0 30px 90px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.6) inset;display:flex;flex-direction:column;align-items:center;gap:16px}
+.cropper-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.cropper-stage{position:relative;width:280px;height:280px;overflow:hidden;border-radius:50%;background:#000;touch-action:none;cursor:grab;box-shadow:0 20px 50px rgba(0,0,0,.4), 0 0 0 2px rgba(139,92,246,.6)}
+.cropper-stage:active{cursor:grabbing}
+.cropper-stage img{position:absolute;top:0;left:0;user-select:none;-webkit-user-drag:none;pointer-events:none;transform-origin:0 0;will-change:transform}
+.cropper-zoom{width:100%;-webkit-appearance:none;appearance:none;height:4px;background:var(--surface3);border-radius:4px;outline:none}
+.cropper-zoom::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;box-shadow:0 4px 12px rgba(139,92,246,.5)}
+.cropper-zoom::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));cursor:pointer;border:0;box-shadow:0 4px 12px rgba(139,92,246,.5)}
+.cropper-actions{display:flex;gap:10px;width:100%}
+.cropper-actions .btn{flex:1}
+.cropper-hint{font-size:11.5px;color:var(--text2);text-align:center;line-height:1.4}
 </style>
 </head>
 <body>
@@ -590,7 +459,6 @@ svg{display:block}
 </section>
 
 <section id="app" class="screen">
-  <!-- НОВАЯ ШАПКА: заголовок "Чаты" + 2 круглые кнопки (как в референсе) -->
   <header class="app-header">
     <h1 class="app-title" data-i18n="nav.chats">Чаты</h1>
     <div class="spacer"></div>
@@ -604,7 +472,6 @@ svg{display:block}
 
   <main id="appMain">
     <div class="panel active" id="panel-chats">
-      <!-- НОВАЯ СТРОКА ПОИСКА (как в референсе) -->
       <div class="chats-search" onclick="document.getElementById('btnSearch').click()">
         <div class="search-box">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text2);flex-shrink:0"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -742,10 +609,41 @@ svg{display:block}
 <script>
 /* ============================================================
    VEXA — v2 with swipe, drag nav, privacy, pages
-   JS НЕ ИЗМЕНЁН — только CSS выше обновлён под pastel glassmorphism
    ============================================================ */
 
 const API = 'https://vexam.onrender.com';
+
+/* ============================================================
+   SUPABASE CONFIG — ЗАПОЛНИ СВОИМИ ЗНАЧЕНИЯМИ!
+   ============================================================ */
+const SUPABASE_URL       = 'https://YOUR-PROJECT.supabase.co';      // <-- ЗАПОЛНИ
+const SUPABASE_ANON_KEY  = 'YOUR_ANON_KEY';                          // <-- ЗАПОЛНИ
+const SUPABASE_BUCKET    = 'avatars';
+const SUPABASE_CONFIGURED = !SUPABASE_URL.includes('YOUR-PROJECT');
+
+/* Загрузка файла в Supabase Storage (аватары).
+   Возвращает публичный URL или null, если Supabase не настроен. */
+async function uploadAvatarToSupabase(userId, blob){
+  if (!SUPABASE_CONFIGURED) return null;
+  const path = `${String(userId)}/${Date.now()}.png`;
+  const url = `${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${path}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey': SUPABASE_ANON_KEY,
+      'Content-Type': 'image/png',
+      'cache-control': '3600',
+      'x-upsert': 'true'
+    },
+    body: blob
+  });
+  if (!res.ok){
+    const txt = await res.text().catch(()=>'');
+    throw new Error(txt || ('HTTP ' + res.status));
+  }
+  return `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${path}`;
+}
 
 (function preventZoom(){
   ['gesturestart','gesturechange','gestureend'].forEach(ev => document.addEventListener(ev, e => e.preventDefault(), {passive:false}));
@@ -1086,14 +984,6 @@ function switchNav(name){
   if (name === 'me') updateMePanel();
 }
 
-/* ============================================================
-   ИСПРАВЛЕНИЕ №3: клик по вкладкам нижней навигации
-   - НЕ вызываем setPointerCapture сразу при pointerdown —
-     иначе iOS Safari не синтезирует click на кнопке.
-   - Захват включается только когда реально началось перетаскивание.
-   - В pointerup вызываем switchNav только при факте drag.
-   - Обычный клик обрабатывается штатным click-обработчиком.
-   ============================================================ */
 let navDrag = null;
 let navJustDragged = false;
 bottomNav.addEventListener('pointerdown', e => {
@@ -1413,7 +1303,6 @@ window.addEventListener('beforeunload', () => {
   if (State.me) DB.updateUser(State.me.id, { lastSeen: Date.now() });
 });
 
-/* ИСПРАВЛЕНИЕ №2: показываем аватар в ME-панели, если он есть */
 function updateMePanel(){
   const u = State.me; if (!u) return;
   const av = document.getElementById('meAvatar');
@@ -1609,9 +1498,9 @@ function chatPreview(chat){
   const prefix = (chat.type === 'group' || chat.type === 'channel') && sender ? displayName(sender).split(' ')[0] + ': ' : '';
   if (last.attachments && last.attachments.length){
     const att = last.attachments[0];
-    if ((att.type||'').startsWith('image/')) return prefix + '📷 Фото';
-    if ((att.type||'').startsWith('video/')) return prefix + '🎬 Видео';
-    return prefix + '📎 ' + (att.name||'file');
+    if ((att.type||'').startsWith('image/')) return prefix + (LANG==='ru'?'Фото':'Photo');
+    if ((att.type||'').startsWith('video/')) return prefix + (LANG==='ru'?'Видео':'Video');
+    return prefix + (att.name||'file');
   }
   return prefix + (last.text || '').slice(0, 60);
 }
@@ -1655,7 +1544,6 @@ function renderChats(){
     const otherU = chatAvatarUser(c);
     if (c.type === 'saved'){ av.style.background = 'linear-gradient(135deg,#2ECC71,#27AE60)'; av.textContent = '★'; }
     else if (c.avatar) av.innerHTML = `<img src="${esc(c.avatar)}" alt=""/>`;
-    /* ИСПРАВЛЕНИЕ №2: аватар собеседника, если есть */
     else if (otherU && otherU.avatar) av.innerHTML = `<img src="${esc(otherU.avatar)}" alt=""/>`;
     else if (otherU) av.textContent = initials(otherU);
     else av.textContent = ((c.title||'?')[0] || '?').toUpperCase();
@@ -1728,12 +1616,15 @@ function renderCallsList(){
   calls.forEach(c => {
     const other = DB.findUserById(c.from === State.me.id ? c.to : c.from);
     if (!other) return;
+    const callIcon = c.type === 'video'
+      ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>'
+      : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.4 1.8.7 2.6a2 2 0 01-.5 2.1L8 9.7a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.5c.8.3 1.7.6 2.6.7a2 2 0 011.7 2z"/></svg>';
     const r = el(`
       <div class="p-item">
         <div class="avatar av-54">${esc(initials(other))}</div>
         <div style="flex:1;min-width:0">
           <div style="font-weight:600;font-size:15.5px">${esc(displayName(other))}</div>
-          <div style="color:var(--text2);font-size:13px;margin-top:2px">${c.type === 'video' ? '📹' : '📞'} · ${new Date(c.createdAt).toLocaleString()}</div>
+          <div style="color:var(--text2);font-size:13px;margin-top:2px;display:flex;align-items:center;gap:4px">${callIcon}<span>${new Date(c.createdAt).toLocaleString()}</span></div>
         </div>
       </div>`);
     box.appendChild(r);
@@ -1759,7 +1650,120 @@ document.querySelectorAll('#meMenu button').forEach(b => {
   };
 });
 
-/* ИСПРАВЛЕНИЕ №2: добавляем загрузку аватарки в редактирование профиля */
+/* ============================================================
+   AVATAR CROPPER (как в Telegram / WhatsApp)
+   - Круглая маска
+   - Тянуть пальцем/мышкой — reposition
+   - Слайдер — zoom
+   - Save — рендерит круглый PNG 400×400 и возвращает blob + dataURL
+   ============================================================ */
+function openAvatarCropper(file, onSave){
+  const reader = new FileReader();
+  reader.onload = () => {
+    const src = reader.result;
+    const bd = document.createElement('div');
+    bd.className = 'cropper-bd open';
+    bd.innerHTML = `
+      <div class="cropper">
+        <div class="cropper-title">${LANG==='ru'?'Настройте фото':'Adjust photo'}</div>
+        <div class="cropper-stage" id="cropStage">
+          <img id="cropImg" src="${src}" draggable="false"/>
+        </div>
+        <input type="range" class="cropper-zoom" id="cropZoom" min="0.5" max="3" step="0.01" value="1"/>
+        <div class="cropper-hint">${LANG==='ru'?'Двигайте пальцем, масштаб — слайдером':'Drag with finger, zoom with slider'}</div>
+        <div class="cropper-actions">
+          <button class="btn btn-2" id="cropCancel">${LANG==='ru'?'Отмена':'Cancel'}</button>
+          <button class="btn" id="cropSave">${LANG==='ru'?'Сохранить':'Save'}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(bd);
+
+    const stage = bd.querySelector('#cropStage');
+    const img   = bd.querySelector('#cropImg');
+    const zoom  = bd.querySelector('#cropZoom');
+    const STAGE = 280;
+    let scale = 1, tx = 0, ty = 0;
+    let baseW = 0, baseH = 0;
+
+    img.onload = () => {
+      const ratio = img.naturalWidth / img.naturalHeight;
+      if (ratio > 1){ baseH = STAGE; baseW = STAGE * ratio; }
+      else { baseW = STAGE; baseH = STAGE / ratio; }
+      img.style.width  = baseW + 'px';
+      img.style.height = baseH + 'px';
+      tx = (STAGE - baseW) / 2;
+      ty = (STAGE - baseH) / 2;
+      apply();
+    };
+
+    function apply(){
+      img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+    }
+
+    /* Drag */
+    let dragging = false, sx = 0, sy = 0, otx = 0, oty = 0;
+    stage.addEventListener('pointerdown', e => {
+      dragging = true;
+      sx = e.clientX; sy = e.clientY;
+      otx = tx; oty = ty;
+      try { stage.setPointerCapture(e.pointerId); } catch(_){}
+      e.preventDefault();
+    });
+    stage.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      tx = otx + (e.clientX - sx);
+      ty = oty + (e.clientY - sy);
+      apply();
+      e.preventDefault();
+    });
+    const endDrag = e => {
+      dragging = false;
+      try { stage.releasePointerCapture(e.pointerId); } catch(_){}
+    };
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    /* Zoom (вокруг центра круга) */
+    zoom.addEventListener('input', () => {
+      const nz = parseFloat(zoom.value) || 1;
+      const cx = STAGE/2, cy = STAGE/2;
+      tx = cx - (cx - tx) * (nz / scale);
+      ty = cy - (cy - ty) * (nz / scale);
+      scale = nz;
+      apply();
+    });
+
+    /* Cancel */
+    bd.querySelector('#cropCancel').onclick = () => bd.remove();
+
+    /* Save */
+    bd.querySelector('#cropSave').onclick = () => {
+      const OUT = 400;
+      const cv = document.createElement('canvas');
+      cv.width = OUT; cv.height = OUT;
+      const ctx = cv.getContext('2d');
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(OUT/2, OUT/2, OUT/2, 0, Math.PI*2);
+      ctx.clip();
+      const k = OUT / STAGE;
+      ctx.translate(tx * k, ty * k);
+      ctx.scale(scale * k, scale * k);
+      try { ctx.drawImage(img, 0, 0, baseW, baseH); } catch(_){}
+      ctx.restore();
+      const dataURL = cv.toDataURL('image/png');
+      cv.toBlob(blob => {
+        bd.remove();
+        onSave(blob, dataURL);
+      }, 'image/png', 0.92);
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ============================================================
+   PROFILE PAGE (с загрузкой аватарки в Supabase)
+   ============================================================ */
 function openProfilePage(){
   const u = State.me;
   openPage({
@@ -1769,7 +1773,10 @@ function openProfilePage(){
         <div class="avatar av-96" id="pfAvatar" style="cursor:pointer">
           ${u.avatar ? `<img src="${esc(u.avatar)}" alt=""/>` : esc(initials(u))}
         </div>
-        <div id="pfAvatarHint" style="color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;margin-top:-6px">📷 ${LANG==='ru'?'Сменить фото':'Change photo'}</div>
+        <div id="pfAvatarHint" style="color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;margin-top:-6px;display:inline-flex;align-items:center;gap:6px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>${LANG==='ru'?'Сменить фото':'Change photo'}</span>
+        </div>
       </div>
       <div class="set-list">
         <label class="lbl" style="padding:12px 18px 0">${esc(t('profile.first'))}</label>
@@ -1808,21 +1815,39 @@ function openProfilePage(){
         inp.onchange = () => {
           const f = inp.files[0]; if (!f) return;
           if (!f.type.startsWith('image/')){ toast(LANG==='ru'?'Нужно изображение':'Image required', 'err'); return; }
-          if (f.size > 2 * 1024 * 1024){
-            toast(LANG==='ru'?'Файл слишком большой (макс 2 МБ)':'File too large (max 2 MB)', 'err');
+          if (f.size > 8 * 1024 * 1024){
+            toast(LANG==='ru'?'Файл слишком большой (макс 8 МБ)':'File too large (max 8 MB)', 'err');
             return;
           }
-          const reader = new FileReader();
-          reader.onload = () => {
-            DB.updateUser(State.me.id, { avatar: reader.result });
-            State.me = DB.findUserById(State.me.id);
+          openAvatarCropper(f, async (blob, dataURL) => {
+            /* 1) Сразу показываем и сохраняем локально (optimistic) */
             const av = p.querySelector('#pfAvatar');
-            av.innerHTML = `<img src="${reader.result}" alt=""/>`;
+            av.innerHTML = `<img src="${dataURL}" alt=""/>`;
+            DB.updateUser(State.me.id, { avatar: dataURL });
+            State.me = DB.findUserById(State.me.id);
             updateMePanel();
             renderChats();
-            toast(t('toast.profile_saved'), 'ok');
-          };
-          reader.readAsDataURL(f);
+
+            /* 2) Если Supabase настроен — заливаем и подменяем на публичный URL */
+            if (SUPABASE_CONFIGURED){
+              try {
+                const pub = await uploadAvatarToSupabase(State.me.id, blob);
+                if (pub){
+                  DB.updateUser(State.me.id, { avatar: pub });
+                  State.me = DB.findUserById(State.me.id);
+                  av.innerHTML = `<img src="${pub}" alt=""/>`;
+                  updateMePanel();
+                  renderChats();
+                  toast(t('toast.profile_saved'), 'ok');
+                }
+              } catch(e){
+                console.error('Supabase upload failed:', e);
+                toast(LANG==='ru'?'Не удалось загрузить на сервер, сохранено локально':'Upload failed, saved locally', 'err');
+              }
+            } else {
+              toast(t('toast.profile_saved'), 'ok');
+            }
+          });
         };
         inp.click();
       };
@@ -2048,7 +2073,7 @@ function openUserProfile(userId){
     ? stories.map(s => `
         <div class="story-circle" data-sid="${s.id}">
           <div style="background:linear-gradient(135deg,#8B5CF6,#A78BFA)">
-            ${s.thumb ? `<img src="${esc(s.thumb)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>` : '📸'}
+            ${s.thumb ? `<img src="${esc(s.thumb)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>` : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>'}
           </div>
         </div>`).join('')
     : `<div style="color:var(--text2);font-size:13px;padding:0 22px">${esc(t('profile.no_stories'))}</div>`;
@@ -2252,7 +2277,6 @@ function renderChatTop(){
   const av = document.getElementById('chatTopAv');
   if (c.type === 'saved'){ av.style.background = 'linear-gradient(135deg,#2ECC71,#27AE60)'; av.textContent = '★'; }
   else if (c.avatar) av.innerHTML = `<img src="${esc(c.avatar)}" alt=""/>`;
-  /* ИСПРАВЛЕНИЕ №2: аватар собеседника, если есть */
   else if (otherU && otherU.avatar) av.innerHTML = `<img src="${esc(otherU.avatar)}" alt=""/>`;
   else if (otherU) av.textContent = initials(otherU);
   else av.textContent = ((c.title||'?')[0] || '?').toUpperCase();
@@ -2374,7 +2398,7 @@ function renderMessage(m){
         } else if ((a.type||'').startsWith('video/')){
           inner += `<video class="attach" src="${esc(a.data)}" controls></video>`;
         } else {
-          inner += `<div class="file-row">📎 <span>${esc(a.name||'file')}</span></div>`;
+          inner += `<div class="file-row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M21.4 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg><span>${esc(a.name||'file')}</span></div>`;
         }
       });
     }
@@ -3123,7 +3147,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ============================================================
-   PUSH ПОДПИСКА (ДИАГНОСТИЧЕСКАЯ ВЕРСИЯ)
+   PUSH ПОДПИСКА
    ============================================================ */
 function urlBase64ToUint8Array(base64String) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -3135,28 +3159,15 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 async function subscribeToPush(){
-  if (!('serviceWorker' in navigator)) {
-    toast('❌ Нет Service Worker', 'err'); return false;
-  }
-  if (!('PushManager' in window)) {
-    toast('❌ Нет PushManager (iOS < 16.4?)', 'err'); return false;
-  }
-  if (!('Notification' in window)) {
-    toast('❌ Нет Notification API', 'err'); return false;
-  }
-  if (!State.me) {
-    toast('❌ Не авторизован', 'err'); return false;
-  }
+  if (!('serviceWorker' in navigator)) { toast('Нет Service Worker', 'err'); return false; }
+  if (!('PushManager' in window)) { toast('Нет PushManager (iOS < 16.4?)', 'err'); return false; }
+  if (!('Notification' in window)) { toast('Нет Notification API', 'err'); return false; }
+  if (!State.me) { toast('Не авторизован', 'err'); return false; }
 
   let perm;
-  try {
-    perm = await Notification.requestPermission();
-  } catch(e) {
-    toast('❌ requestPermission: ' + e.message, 'err'); return false;
-  }
-  if (perm !== 'granted'){
-    toast('❌ Разрешение: ' + perm, 'err'); return false;
-  }
+  try { perm = await Notification.requestPermission(); }
+  catch(e){ toast('requestPermission: ' + e.message, 'err'); return false; }
+  if (perm !== 'granted'){ toast('Разрешение: ' + perm, 'err'); return false; }
 
   let reg;
   try {
@@ -3164,20 +3175,14 @@ async function subscribeToPush(){
       navigator.serviceWorker.ready,
       new Promise((_, rej) => setTimeout(() => rej(new Error('SW timeout 5s')), 5000))
     ]);
-  } catch(e) {
-    toast('❌ SW: ' + e.message, 'err'); return false;
-  }
+  } catch(e) { toast('SW: ' + e.message, 'err'); return false; }
 
   let keyData;
   try {
     const keyRes = await fetch(API + '/api/vapid-public-key');
     keyData = await keyRes.json();
-  } catch(e) {
-    toast('❌ VAPID: ' + e.message, 'err'); return false;
-  }
-  if (!keyData.publicKey){
-    toast('❌ VAPID пустой', 'err'); return false;
-  }
+  } catch(e) { toast('VAPID: ' + e.message, 'err'); return false; }
+  if (!keyData.publicKey){ toast('VAPID пустой', 'err'); return false; }
 
   let sub;
   try {
@@ -3188,9 +3193,7 @@ async function subscribeToPush(){
         applicationServerKey: urlBase64ToUint8Array(keyData.publicKey)
       });
     }
-  } catch(e) {
-    toast('❌ Subscribe: ' + e.message, 'err'); return false;
-  }
+  } catch(e) { toast('Subscribe: ' + e.message, 'err'); return false; }
 
   try {
     const r = await fetch(API + '/api/push-subscribe', {
@@ -3202,15 +3205,11 @@ async function subscribeToPush(){
       })
     });
     const d = await r.json();
-    if (!d.ok) {
-      toast('❌ Сервер: ' + JSON.stringify(d), 'err'); return false;
-    }
-  } catch(e) {
-    toast('❌ Запрос: ' + e.message, 'err'); return false;
-  }
+    if (!d.ok) { toast('Сервер: ' + JSON.stringify(d), 'err'); return false; }
+  } catch(e) { toast('Запрос: ' + e.message, 'err'); return false; }
 
   localStorage.setItem('vexa.push.enabled', '1');
-  toast('✅ Подписка активна!', 'ok');
+  toast('Подписка активна!', 'ok');
   return true;
 }
 
