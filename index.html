@@ -439,6 +439,8 @@ svg{display:block}
     <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
     <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
     <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+    <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
+    <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
   </div>
   <div class="otp-meta">
     <a id="otpChange" data-i18n="otp.change">Изменить email</a>
@@ -861,8 +863,6 @@ function digitsOf(s){ return (s||'').replace(/\D/g,''); }
 function emailValid(v){
   const s = String(v||'').trim();
   if (!s) return false;
-  // Минимум: что-то@что-то.что-то, без пробелов
-  // Проверяем наличие @ — ОБЯЗАТЕЛЬНО по требованию
   if (!s.includes('@')) return false;
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
@@ -1068,7 +1068,6 @@ const btnSendCode = document.getElementById('btnSendCode');
 const phoneErr = document.getElementById('phoneErr');
 
 emailInput.addEventListener('input', () => {
-  // авто-обрезка пробелов по краям
   refreshSend();
 });
 emailInput.addEventListener('blur', () => {
@@ -1152,21 +1151,21 @@ otpCells.forEach((cell, i) => {
     let v = e.target.value.replace(/\D/g,'');
     if (v.length > 1){
       const arr = v.split('');
-      for (let k=0;k<arr.length && i+k<6;k++) otpCells[i+k].value = arr[k];
-      otpCells[Math.min(5, i+arr.length)].focus();
-    } else { cell.value = v; if (v && i < 5) otpCells[i+1].focus(); }
+      for (let k=0;k<arr.length && i+k<8;k++) otpCells[i+k].value = arr[k];
+      otpCells[Math.min(7, i+arr.length)].focus();
+    } else { cell.value = v; if (v && i < 7) otpCells[i+1].focus(); }
     refreshVerify();
   });
   cell.addEventListener('keydown', e => {
     if (e.key === 'Backspace' && !cell.value && i > 0) otpCells[i-1].focus();
     if (e.key === 'ArrowLeft' && i > 0) otpCells[i-1].focus();
-    if (e.key === 'ArrowRight' && i < 5) otpCells[i+1].focus();
+    if (e.key === 'ArrowRight' && i < 7) otpCells[i+1].focus();
   });
   cell.addEventListener('paste', e => {
     e.preventDefault();
-    const txt = (e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);
-    for (let k=0;k<6;k++) otpCells[k].value = txt[k] || '';
-    otpCells[Math.min(5, txt.length)].focus();
+    const txt = (e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,8);
+    for (let k=0;k<8;k++) otpCells[k].value = txt[k] || '';
+    otpCells[Math.min(7, txt.length)].focus();
     refreshVerify();
   });
 });
@@ -1195,7 +1194,7 @@ otpResend.onclick = async () => {
 
 btnVerify.onclick = async () => {
   const token = otpValue();
-  if (token.length !== 6){ toast(t('err.otp'), 'err'); return; }
+  if (token.length !== 8){ toast(t('err.otp'), 'err'); return; }
   const email = State.tempEmail;
   if (!email){ showScreen('auth'); return; }
   if (!supabaseAuth){ toast('Supabase не настроен', 'err'); return; }
