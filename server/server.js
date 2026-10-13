@@ -31,18 +31,19 @@ if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
 // ================= USERS =================
 
 app.post('/api/register', async (req, res) => {
-  const { phone, firstName, lastName, username } = req.body;
-  let p = (phone||'').replace(/\D/g, '');
-  if (p[0] === '8') p = '7' + p.slice(1);
-  const e164 = '+' + p;
+  const { id, email, firstName, lastName, username } = req.body;
+  if (!id || !email) return res.status(400).json({ error: 'missing_fields' });
   try {
-    const exists = await pool.query('SELECT * FROM users WHERE phone=$1', [e164]);
+    const exists = await pool.query(
+      'SELECT * FROM users WHERE id=$1 OR email=$2',
+      [id, email]
+    );
     if (exists.rows.length) return res.json({ ok: true, user: exists.rows[0] });
 
     const result = await pool.query(
-      `INSERT INTO users (phone, first_name, last_name, username)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
-      [e164, firstName, lastName || null, username || null]
+      `INSERT INTO users (id, email, first_name, last_name, username)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [id, email, firstName, lastName || null, username || null]
     );
     const user = result.rows[0];
 
@@ -59,6 +60,23 @@ app.post('/api/register', async (req, res) => {
     res.json({ ok: true, user });
   } catch (e) {
     if (e.code === '23505') return res.status(400).json({ error: 'username_taken' });
+    console.error(e);
+    res.status(500).json({ error: 'db_error' });
+  }
+});
+
+app.post('/api/find-by-email', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.json({ found: false });
+  try {
+    const result = await pool.query(
+      `SELECT id, email, username, first_name, last_name, avatar, bio, last_seen
+       FROM users WHERE LOWER(email) = LOWER($1)`,
+      [email]
+    );
+    if (!result.rows.length) return res.json({ found: false });
+    res.json({ found: true, user: result.rows[0] });
+  } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'db_error' });
   }
@@ -110,7 +128,7 @@ app.get('/api/chats/:userId', async (req, res) => {
     const chats = await pool.query(
       `SELECT c.*,
               (SELECT json_agg(json_build_object(
-                'id', u.id, 'phone', u.phone, 'username', u.username,
+                'id', u.id, 'email', u.email, 'username', u.username,
                 'first_name', u.first_name, 'last_name', u.last_name,
                 'avatar', u.avatar, 'last_seen', u.last_seen
               )) FROM chat_members cm2 JOIN users u ON u.id = cm2.user_id
@@ -172,7 +190,7 @@ async function loadChat(chatId) {
   const r = await pool.query(
     `SELECT c.*,
             (SELECT json_agg(json_build_object(
-              'id', u.id, 'phone', u.phone, 'username', u.username,
+              'id', u.id, 'email', u.email, 'username', u.username,
               'first_name', u.first_name, 'last_name', u.last_name,
               'avatar', u.avatar, 'last_seen', u.last_seen
             )) FROM chat_members cm JOIN users u ON u.id = cm.user_id
@@ -284,7 +302,7 @@ async function sendPushToChatMembers(chatId, senderId, text) {
     const userIds = members.rows.map(r => r.user_id);
 
     const subs = await pool.query(
-      'SELECT id, endpoint, keys_p256dh, keys_auth FROM push_subscriptions WHERE user_id = ANY($1::int[])',
+      'SELECT id, endpoint, keys_p256dh, keys_auth FROM push_subscriptions WHERE user_id = ANY($1::text[])',
       [userIds]
     );
 
