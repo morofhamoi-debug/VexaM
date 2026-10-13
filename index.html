@@ -1146,7 +1146,7 @@ const otpResend = document.getElementById('otpResend');
 const otpTimer = document.getElementById('otpTimer');
 let resendInterval;
 function otpValue(){ return otpCells.map(c => c.value).join(''); }
-function refreshVerify(){ btnVerify.disabled = otpValue().length !== 6; }
+function refreshVerify(){ btnVerify.disabled = otpValue().length !== 8; }
 otpCells.forEach((cell, i) => {
   cell.addEventListener('input', e => {
     let v = e.target.value.replace(/\D/g,'');
