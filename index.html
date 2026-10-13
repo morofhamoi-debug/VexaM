@@ -13,6 +13,8 @@
 <meta name="theme-color" content="#8B5CF6"/>
 <title>VEXA</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%238B5CF6'/><stop offset='1' stop-color='%23A78BFA'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='url(%23g)'/><text x='50' y='68' font-size='60' font-weight='800' fill='white' text-anchor='middle' font-family='Arial'>V</text></svg>"/>
+<!-- ===== SUPABASE SDK ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ============================================================
    VEXA — Pastel Glassmorphism redesign
@@ -126,6 +128,8 @@ svg{display:block}
 .phone-row{display:flex;gap:10px}
 .country-btn{display:flex;align-items:center;gap:8px;padding:0 16px;height:54px;border-radius:20px;background:var(--glass-bg);white-space:nowrap;font-weight:600;font-size:16px;border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
 #phoneInput{flex:1;height:54px;font-size:17px;letter-spacing:.4px}
+#emailInput{flex:1;height:54px;font-size:17px;letter-spacing:.2px;padding:15px 18px;border-radius:20px;background:var(--glass-bg);border:1px solid var(--glass-border);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);transition:border-color .15s,box-shadow .15s;width:100%}
+#emailInput:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(139,92,246,.14)}
 .hint{font-size:12px;color:var(--text2);margin-top:8px}
 .err{font-size:12px;color:var(--danger);margin-top:6px;min-height:14px}
 .otp-wrap{display:flex;gap:8px;margin:22px 0}
@@ -374,7 +378,7 @@ svg{display:block}
 .edge-back-hint::after{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%) scaleY(0);width:4px;height:44px;border-radius:4px;background:var(--accent);transition:transform .2s}
 .edge-back-hint.active::after{transform:translateY(-50%) scaleY(1)}
 
-/* ============ AVATAR CROPPER (НОВОЕ) ============ */
+/* ============ AVATAR CROPPER ============ */
 .cropper-bd{position:fixed;inset:0;background:rgba(10,5,20,.92);z-index:400;display:none;align-items:center;justify-content:center;padding:20px;animation:fs .2s}
 .cropper-bd.open{display:flex}
 .cropper{width:100%;max-width:360px;padding:22px;border-radius:28px;background:var(--glass-bg);-webkit-backdrop-filter:blur(40px) saturate(200%);backdrop-filter:blur(40px) saturate(200%);border:1px solid var(--glass-border);box-shadow:0 30px 90px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.6) inset;display:flex;flex-direction:column;align-items:center;gap:16px}
@@ -411,14 +415,13 @@ svg{display:block}
     <button class="icon-btn" id="authBack"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
     <button class="btn-2 btn-sm" id="authToLogin" data-i18n="auth.have">Уже есть аккаунт?</button>
   </div>
-  <h1 class="auth-title" data-i18n="auth.title">Введите номер телефона</h1>
-  <p class="auth-sub" data-i18n="auth.sub">Мы отправим SMS с кодом</p>
-  <label class="lbl" data-i18n="auth.phone">Номер телефона</label>
+  <h1 class="auth-title" data-i18n="auth.title">Введите email</h1>
+  <p class="auth-sub" data-i18n="auth.sub">Мы отправим код подтверждения на почту</p>
+  <label class="lbl" data-i18n="auth.phone">Email</label>
   <div class="phone-row">
-    <button class="country-btn" id="countryBtn">🇷🇺 +7</button>
-    <input class="field" id="phoneInput" type="tel" inputmode="numeric" placeholder="+7 (___) ___-__-__"/>
+    <input class="field" id="emailInput" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="your@email.com"/>
   </div>
-  <div class="hint" data-i18n="auth.hint">11 цифр, начиная с +7</div>
+  <div class="hint" data-i18n="auth.hint">Например: name@gmail.com (обязательно с @)</div>
   <div class="err" id="phoneErr"></div>
   <button class="btn" id="btnSendCode" disabled style="margin-top:14px" data-i18n="auth.continue">Продолжить</button>
 </section>
@@ -438,7 +441,7 @@ svg{display:block}
     <input class="otp-cell" maxlength="1" inputmode="numeric" pattern="[0-9]*"/>
   </div>
   <div class="otp-meta">
-    <a id="otpChange" data-i18n="otp.change">Изменить номер</a>
+    <a id="otpChange" data-i18n="otp.change">Изменить email</a>
     <a id="otpResend" class="disabled"><span data-i18n="otp.resend">Отправить снова через</span> <span id="otpTimer">60</span>с</a>
   </div>
   <div class="code-banner" id="codeBanner"></div>
@@ -621,6 +624,11 @@ const SUPABASE_ANON_KEY  = 'YOUR_ANON_KEY';                          // <-- ЗА
 const SUPABASE_BUCKET    = 'avatars';
 const SUPABASE_CONFIGURED = !SUPABASE_URL.includes('YOUR-PROJECT');
 
+/* Supabase client для Auth (email-коды) */
+const supabaseAuth = (SUPABASE_CONFIGURED && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
 /* Загрузка файла в Supabase Storage (аватары).
    Возвращает публичный URL или null, если Supabase не настроен. */
 async function uploadAvatarToSupabase(userId, blob){
@@ -714,6 +722,7 @@ const DB = (() => {
     persist: save, uid,
     createUser(d){ const u={id:String(d.id||uid()),createdAt:Date.now(),lastSeen:Date.now(),privacy:{...DEFAULT_PRIVACY},stories:[],birthday:null,...d}; load().users.push(u); save(); return u; },
     findUserByPhone(p){ return load().users.find(u => u.phone === p); },
+    findUserByEmail(e){ if(!e) return null; e=e.toLowerCase(); return load().users.find(x => (x.email||'').toLowerCase()===e); },
     findUserByUsername(u){ if(!u) return null; u=u.toLowerCase(); return load().users.find(x => (x.username||'').toLowerCase()===u); },
     findUserById(id){ return load().users.find(u => String(u.id) === String(id)); },
     updateUser(id, patch){ const u=this.findUserById(id); if(!u) return; Object.assign(u, patch); save(); return u; },
@@ -748,10 +757,11 @@ const STR = {
   ru:{
     'welcome.slogan':'Общение без границ','welcome.start':'Начать',
     'welcome.legal':'Продолжая, вы принимаете условия использования и политику конфиденциальности.',
-    'auth.title':'Введите номер телефона','auth.sub':'Мы отправим SMS с кодом','auth.phone':'Номер телефона',
-    'auth.hint':'11 цифр, начиная с +7','auth.continue':'Продолжить','auth.have':'Уже есть аккаунт?',
-    'otp.title':'Введите код','otp.sub':'Мы отправили SMS на','otp.change':'Изменить номер',
+    'auth.title':'Введите email','auth.sub':'Мы отправим код подтверждения на почту','auth.phone':'Email',
+    'auth.hint':'Например: name@gmail.com (обязательно с @)','auth.continue':'Продолжить','auth.have':'Уже есть аккаунт?',
+    'otp.title':'Введите код','otp.sub':'Мы отправили код на','otp.change':'Изменить email',
     'otp.resend':'Отправить снова через','otp.confirm':'Подтвердить','otp.banner':'Ваш код:',
+    'otp.check_mail':'Проверьте почту (и папку «Спам»). Код действует несколько минут.',
     'name.title':'Как вас зовут?','name.sub':'Это увидят другие пользователи VEXA',
     'name.first':'Имя *','name.last':'Фамилия','name.user':'Username','name.create':'Создать аккаунт',
     'tab.all':'Все','tab.personal':'Личные','tab.groups':'Группы','tab.channels':'Каналы','tab.unread':'Непрочитанные','tab.saved':'Избранное',
@@ -765,15 +775,15 @@ const STR = {
     'menu.delete_account':'Удалить аккаунт','menu.notifications':'Уведомления',
     'contacts.empty':'Контактов пока нет','contacts.empty_sub':'Найдите пользователя.','contacts.add':'Добавить','contacts.remove':'Удалить','contacts.write':'Написать','contacts.search':'Поиск',
     'calls.empty':'Звонков пока нет','calls.empty_sub':'Здесь появится история звонков.','calls.unavailable':'Звонки требуют WebRTC-сервер.',
-    'profile.edit':'Редактировать','profile.save':'Сохранить','profile.first':'Имя','profile.last':'Фамилия','profile.user':'Username','profile.bio':'О себе','profile.phone':'Телефон','profile.birthday':'Дата рождения','profile.close':'Закрыть','profile.delete':'Удалить чат',
+    'profile.edit':'Редактировать','profile.save':'Сохранить','profile.first':'Имя','profile.last':'Фамилия','profile.user':'Username','profile.bio':'О себе','profile.phone':'Email','profile.birthday':'Дата рождения','profile.close':'Закрыть','profile.delete':'Удалить чат',
     'settings.title':'Настройки','settings.theme':'Тема','settings.light':'Светлая','settings.dark':'Тёмная','settings.system':'Системная',
     'settings.lang':'Язык','settings.anim':'Анимации','settings.compact':'Компактный режим','settings.accent':'Акцентный цвет',
-    'privacy.title':'Приватность','privacy.phone':'Кто видит мой номер','privacy.find':'Кто может найти по номеру','privacy.lastSeen':'Кто видит время посещения','privacy.online':'Кто видит, что я в сети','privacy.avatar':'Кто видит моё фото','privacy.bio':'Кто видит описание','privacy.groups':'Кто может добавлять в группы','privacy.calls':'Кто может звонить мне','privacy.forwards':'Ссылка на профиль при пересылке',
+    'privacy.title':'Приватность','privacy.phone':'Кто видит мой email','privacy.find':'Кто может найти по email','privacy.lastSeen':'Кто видит время посещения','privacy.online':'Кто видит, что я в сети','privacy.avatar':'Кто видит моё фото','privacy.bio':'Кто видит описание','privacy.groups':'Кто может добавлять в группы','privacy.calls':'Кто может звонить мне','privacy.forwards':'Ссылка на профиль при пересылке',
     'privacy.everyone':'Все','privacy.contacts':'Мои контакты','privacy.nobody':'Никто',
-    'find.title':'Найти по номеру','find.hint':'Введите номер телефона','find.notfound':'Не найден','find.self':'Это ваш номер','find.search':'Найти',
+    'find.title':'Найти по email','find.hint':'Введите email','find.notfound':'Не найден','find.self':'Это ваш email','find.search':'Найти',
     'group.title':'Создать группу','group.name':'Название','group.desc':'Описание','group.members':'Участники','group.create':'Создать','group.no_contacts':'Нет пользователей',
     'channel.title':'Создать канал','channel.name':'Название','channel.desc':'Описание','channel.public':'Публичный','channel.create':'Создать',
-    'sheet.title':'Создать','sheet.group':'Создать группу','sheet.channel':'Создать канал','sheet.find':'Найти по номеру','sheet.cancel':'Отмена',
+    'sheet.title':'Создать','sheet.group':'Создать группу','sheet.channel':'Создать канал','sheet.find':'Найти по email','sheet.cancel':'Отмена',
     'confirm.title':'Подтверждение','confirm.delete_chat':'Удалить чат?','confirm.delete_msg':'Удалить сообщение?','confirm.logout':'Выйти?','confirm.delete_account':'Удалить аккаунт навсегда?','confirm.cancel':'Отмена','confirm.yes':'Удалить','confirm.delete_msg_all':'Удалить у всех?','confirm.delete_msg_me':'Удалить у себя?','confirm.delete_msg_all_text':'Сообщение будет удалено у всех участников.',
     'msg.edited':'изменено','msg.deleted':'Сообщение удалено','msg.you':'Вы',
     'toast.lang_switched':'Язык изменён','toast.theme':'Тема сохранена','toast.logged_out':'Вы вышли','toast.account_deleted':'Аккаунт удалён',
@@ -782,7 +792,8 @@ const STR = {
     'toast.group_created':'Группа создана','toast.channel_created':'Канал создан','toast.fill_name':'Введите имя','toast.select_members':'Выберите участников',
     'toast.file_sent':'Файл отправлен','toast.file_big':'Файл слишком большой (макс 3 МБ)','toast.msg_deleted_all':'Удалено у всех','toast.msg_deleted_me':'Удалено',
     'toast.server_error':'Ошибка сервера','toast.no_connection':'Нет связи с сервером. Подожди 30 сек',
-    'err.phone':'Некорректный номер','err.otp':'Неверный код',
+    'toast.code_sent':'Код отправлен на почту','toast.bad_email':'Введите корректный email (обязательно с @)',
+    'err.phone':'Введите корректный email (с @)','err.otp':'Неверный код',
     'status.online':'в сети','status.recently':'был недавно','status.just_now':'был только что','status.min_ago':'мин назад','status.hour_ago':'ч назад',
     'status.was_at':'Был в','status.was_yesterday':'Был вчера в','status.hidden':'был недавно',
     'profile.info':'Информация','profile.stories':'Истории','profile.no_stories':'Нет историй','profile.add_contact':'Добавить в контакты','profile.remove_contact':'Убрать из контактов','profile.send_msg':'Написать','profile.block':'Заблокировать','profile.report':'Пожаловаться','profile.share':'Поделиться'
@@ -790,10 +801,11 @@ const STR = {
   en:{
     'welcome.slogan':'Communication without borders','welcome.start':'Get started',
     'welcome.legal':'By continuing you accept our terms of service and privacy policy.',
-    'auth.title':'Enter your phone number','auth.sub':"We'll send an SMS with a code",'auth.phone':'Phone number',
-    'auth.hint':'11 digits starting with +7','auth.continue':'Continue','auth.have':'Already have an account?',
-    'otp.title':'Enter the code','otp.sub':'We sent an SMS to','otp.change':'Change number',
+    'auth.title':'Enter your email','auth.sub':"We'll send a verification code to your inbox",'auth.phone':'Email',
+    'auth.hint':'e.g. name@gmail.com (must contain @)','auth.continue':'Continue','auth.have':'Already have an account?',
+    'otp.title':'Enter the code','otp.sub':'We sent a code to','otp.change':'Change email',
     'otp.resend':'Resend in','otp.confirm':'Confirm','otp.banner':'Your code:',
+    'otp.check_mail':'Check your inbox (and Spam). The code expires in a few minutes.',
     'name.title':"What's your name?",'name.sub':'Other VEXA users will see this',
     'name.first':'First name *','name.last':'Last name','name.user':'Username','name.create':'Create account',
     'tab.all':'All','tab.personal':'Personal','tab.groups':'Groups','tab.channels':'Channels','tab.unread':'Unread','tab.saved':'Saved',
@@ -804,20 +816,21 @@ const STR = {
     'menu.help':'Help','menu.about':'About','menu.logout':'Log out','menu.delete_account':'Delete account','menu.notifications':'Notifications',
     'contacts.empty':'No contacts yet','contacts.empty_sub':'Find a user.','contacts.add':'Add','contacts.remove':'Remove','contacts.write':'Message','contacts.search':'Search',
     'calls.empty':'No calls yet','calls.empty_sub':'Call history appears here.','calls.unavailable':'Calls require a WebRTC server.',
-    'profile.edit':'Edit','profile.save':'Save','profile.first':'First name','profile.last':'Last name','profile.user':'Username','profile.bio':'About','profile.phone':'Phone','profile.birthday':'Birthday','profile.close':'Close','profile.delete':'Delete chat',
+    'profile.edit':'Edit','profile.save':'Save','profile.first':'First name','profile.last':'Last name','profile.user':'Username','profile.bio':'About','profile.phone':'Email','profile.birthday':'Birthday','profile.close':'Close','profile.delete':'Delete chat',
     'settings.title':'Settings','settings.theme':'Theme','settings.light':'Light','settings.dark':'Dark','settings.system':'System',
     'settings.lang':'Language','settings.anim':'Animations','settings.compact':'Compact','settings.accent':'Accent',
-    'privacy.title':'Privacy','privacy.phone':'Who sees my phone','privacy.find':'Who can find me by phone','privacy.lastSeen':'Who sees my last seen','privacy.online':'Who sees my online status','privacy.avatar':'Who sees my photo','privacy.bio':'Who sees my bio','privacy.groups':'Who can add me to groups','privacy.calls':'Who can call me','privacy.forwards':'Profile link in forwards',
+    'privacy.title':'Privacy','privacy.phone':'Who sees my email','privacy.find':'Who can find me by email','privacy.lastSeen':'Who sees my last seen','privacy.online':'Who sees my online status','privacy.avatar':'Who sees my photo','privacy.bio':'Who sees my bio','privacy.groups':'Who can add me to groups','privacy.calls':'Who can call me','privacy.forwards':'Profile link in forwards',
     'privacy.everyone':'Everyone','privacy.contacts':'My contacts','privacy.nobody':'Nobody',
-    'find.title':'Find by number','find.hint':'Enter a phone number','find.notfound':'Not found','find.self':'This is your number','find.search':'Search',
+    'find.title':'Find by email','find.hint':'Enter an email','find.notfound':'Not found','find.self':'This is your email','find.search':'Search',
     'group.title':'New group','group.name':'Name','group.desc':'Description','group.members':'Members','group.create':'Create','group.no_contacts':'No users',
     'channel.title':'New channel','channel.name':'Name','channel.desc':'Description','channel.public':'Public','channel.create':'Create',
-    'sheet.title':'Create','sheet.group':'Create group','sheet.channel':'Create channel','sheet.find':'Find by number','sheet.cancel':'Cancel',
+    'sheet.title':'Create','sheet.group':'Create group','sheet.channel':'Create channel','sheet.find':'Find by email','sheet.cancel':'Cancel',
     'confirm.title':'Confirm','confirm.delete_chat':'Delete chat?','confirm.delete_msg':'Delete message?','confirm.logout':'Log out?','confirm.delete_account':'Delete account permanently?','confirm.cancel':'Cancel','confirm.yes':'Delete','confirm.delete_msg_all':'Delete for everyone?','confirm.delete_msg_me':'Delete for me?','confirm.delete_msg_all_text':'Message will be deleted for all members.',
     'msg.edited':'edited','msg.deleted':'Message deleted','msg.you':'You',
     'toast.lang_switched':'Language changed','toast.theme':'Theme saved','toast.logged_out':'Signed out','toast.account_deleted':'Account deleted','toast.welcome':'Welcome!','toast.profile_saved':'Profile saved','toast.username_taken':'Username taken','toast.username_free':'Available','toast.copied':'Copied','toast.contact_added':'Contact added','toast.contact_removed':'Contact removed','toast.chat_created':'Chat created','toast.group_created':'Group created','toast.channel_created':'Channel created','toast.fill_name':'Enter a name','toast.select_members':'Select members','toast.file_sent':'File sent','toast.file_big':'File too large (max 3 MB)','toast.msg_deleted_all':'Deleted for everyone','toast.msg_deleted_me':'Deleted',
     'toast.server_error':'Server error','toast.no_connection':'No connection. Try again in 30 sec',
-    'err.phone':'Invalid phone','err.otp':'Wrong code',
+    'toast.code_sent':'Code sent to your email','toast.bad_email':'Enter a valid email (must contain @)',
+    'err.phone':'Enter a valid email (with @)','err.otp':'Wrong code',
     'status.online':'online','status.recently':'last seen recently','status.just_now':'last seen just now','status.min_ago':'min ago','status.hour_ago':'h ago',
     'status.was_at':'Last seen at','status.was_yesterday':'Last seen yesterday at','status.hidden':'last seen recently',
     'profile.info':'Info','profile.stories':'Stories','profile.no_stories':'No stories','profile.add_contact':'Add to contacts','profile.remove_contact':'Remove from contacts','profile.send_msg':'Message','profile.block':'Block','profile.report':'Report','profile.share':'Share'
@@ -831,7 +844,7 @@ function applyLang(){
   document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.dataset.i18n));
   document.querySelectorAll('#langWelcome button').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
   const cb = document.getElementById('codeBanner');
-  if (cb && cb.dataset.code) cb.innerHTML = t('otp.banner') + ' <strong>' + cb.dataset.code + '</strong>';
+  if (cb && cb.dataset.mode === 'info') cb.textContent = t('otp.check_mail');
   const mi = document.getElementById('msgInput'); if (mi) mi.placeholder = t('chat.input_ph');
 }
 function setLang(l){
@@ -841,23 +854,18 @@ function setLang(l){
 }
 
 function digitsOf(s){ return (s||'').replace(/\D/g,''); }
-function normalizePhone(raw){
-  let d = digitsOf(raw); if (!d) return '';
-  if (d[0] === '8') d = '7' + d.slice(1);
-  if (d[0] !== '7') d = '7' + d;
-  return d.slice(0, 11);
+
+/* ============================================================
+   EMAIL VALIDATION — обязательно с @ и доменом
+   ============================================================ */
+function emailValid(v){
+  const s = String(v||'').trim();
+  if (!s) return false;
+  // Минимум: что-то@что-то.что-то, без пробелов
+  // Проверяем наличие @ — ОБЯЗАТЕЛЬНО по требованию
+  if (!s.includes('@')) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
 }
-function formatPhone(raw){
-  const d = normalizePhone(raw); if (!d) return '';
-  const r = d.slice(1); let o = '+7';
-  if (r.length) o += ' (' + r.slice(0,3);
-  if (r.length >= 3) o += ')';
-  if (r.length > 3) o += ' ' + r.slice(3,6);
-  if (r.length > 6) o += '-' + r.slice(6,8);
-  if (r.length > 8) o += '-' + r.slice(8,10);
-  return o;
-}
-function phoneValid(v){ return digitsOf(v).length === 11; }
 
 let toastTimer;
 function toast(msg, kind){
@@ -870,7 +878,7 @@ function toast(msg, kind){
 }
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id)); }
 function initials(u){ if (!u) return '?'; const a=(u.firstName||'')[0]||'', b=(u.lastName||'')[0]||''; return ((a+b)||(u.username||'')[0]||'?').toUpperCase(); }
-function displayName(u){ if (!u) return '—'; return [u.firstName, u.lastName].filter(Boolean).join(' ') || u.username || u.phone || '—'; }
+function displayName(u){ if (!u) return '—'; return [u.firstName, u.lastName].filter(Boolean).join(' ') || u.username || u.email || '—'; }
 function el(h){ const tpl=document.createElement('template'); tpl.innerHTML=h.trim(); return tpl.content.firstElementChild; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function fmtTime(ts){ const d=new Date(ts); return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
@@ -928,7 +936,8 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
 
 const State = {
   me: null, activeChat: null, activeTab: 'all', activeNav: 'chats',
-  replyTo: null, editing: null, tempOtp: null, tempPhone: null,
+  replyTo: null, editing: null,
+  tempEmail: null, tempSupabaseId: null,
   pageStack: [], lastSeenMsgId: null
 };
 
@@ -1051,50 +1060,85 @@ document.querySelectorAll('#langWelcome button').forEach(b => {
   b.onclick = () => { setLang(b.dataset.lang); toast(t('toast.lang_switched')); };
 });
 
-const phoneInput = document.getElementById('phoneInput');
+/* ============================================================
+   AUTH FLOW (EMAIL + SUPABASE OTP)
+   ============================================================ */
+const emailInput = document.getElementById('emailInput');
 const btnSendCode = document.getElementById('btnSendCode');
 const phoneErr = document.getElementById('phoneErr');
-phoneInput.addEventListener('focus', () => { if (!phoneInput.value) phoneInput.value = '+7 '; });
-phoneInput.addEventListener('blur', () => { if (digitsOf(phoneInput.value).length <= 1) phoneInput.value = ''; refreshSend(); });
-phoneInput.addEventListener('input', e => {
-  const inp = e.target;
-  const cur = inp.selectionStart;
-  const before = digitsOf(inp.value.slice(0, cur)).length;
-  const formatted = formatPhone(inp.value);
-  inp.value = formatted;
-  let pos=0, cnt=0;
-  while (pos < formatted.length && cnt < before){ if (/\d/.test(formatted[pos])) cnt++; pos++; }
-  inp.setSelectionRange(pos, pos);
+
+emailInput.addEventListener('input', () => {
+  // авто-обрезка пробелов по краям
   refreshSend();
 });
-phoneInput.addEventListener('keydown', e => {
-  if (e.key === 'Backspace' && digitsOf(phoneInput.value).length <= 1) e.preventDefault();
+emailInput.addEventListener('blur', () => {
+  emailInput.value = emailInput.value.trim();
+  refreshSend();
 });
+emailInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && emailValid(emailInput.value)){
+    btnSendCode.click();
+  }
+});
+
 function refreshSend(){
-  const ok = phoneValid(phoneInput.value);
+  const v = emailInput.value.trim();
+  const ok = emailValid(v);
   btnSendCode.disabled = !ok;
-  phoneErr.textContent = phoneInput.value && !ok ? t('err.phone') : '';
+  phoneErr.textContent = v && !ok ? t('err.phone') : '';
 }
-btnSendCode.onclick = () => {
-  if (!phoneValid(phoneInput.value)) return;
-  const e164 = '+' + digitsOf(phoneInput.value);
-  State.tempPhone = e164;
-  State.tempOtp = String(Math.floor(100000 + Math.random() * 900000));
-  document.getElementById('otpSub').textContent = (LANG==='ru'?'Мы отправили SMS на ':'We sent an SMS to ') + formatPhone(e164);
-  const cb = document.getElementById('codeBanner');
-  cb.dataset.code = State.tempOtp;
-  cb.innerHTML = t('otp.banner') + ' <strong>' + State.tempOtp + '</strong>';
-  document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
-  btnVerify.disabled = true;
-  showScreen('otp');
-  startResend();
-  setTimeout(() => document.querySelectorAll('.otp-cell')[0].focus(), 100);
+
+btnSendCode.onclick = async () => {
+  const email = emailInput.value.trim().toLowerCase();
+  if (!emailValid(email)){
+    phoneErr.textContent = t('err.phone');
+    return;
+  }
+  if (!supabaseAuth){
+    toast('Supabase не настроен', 'err');
+    return;
+  }
+
+  btnSendCode.disabled = true;
+  phoneErr.textContent = '';
+
+  try {
+    const { error } = await supabaseAuth.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: true }
+    });
+    if (error){
+      toast(error.message || t('toast.server_error'), 'err');
+      btnSendCode.disabled = false;
+      return;
+    }
+
+    State.tempEmail = email;
+    document.getElementById('otpSub').textContent =
+      (LANG==='ru' ? 'Мы отправили код на ' : 'We sent a code to ') + email;
+
+    const cb = document.getElementById('codeBanner');
+    cb.dataset.mode = 'info';
+    cb.dataset.code = '';
+    cb.innerHTML = t('otp.check_mail');
+
+    document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
+    btnVerify.disabled = true;
+    showScreen('otp');
+    startResend();
+    setTimeout(() => document.querySelectorAll('.otp-cell')[0].focus(), 100);
+    toast(t('toast.code_sent'), 'ok');
+  } catch (e) {
+    console.error(e);
+    toast(e.message || t('toast.server_error'), 'err');
+    btnSendCode.disabled = false;
+  }
 };
+
 document.getElementById('authBack').onclick = () => showScreen('welcome');
-document.getElementById('authToLogin').onclick = () => phoneInput.focus();
-document.getElementById('countryBtn').onclick = () => toast(LANG==='ru'?'Доступен только +7':'Only +7 available');
+document.getElementById('authToLogin').onclick = () => emailInput.focus();
 document.getElementById('otpBack').onclick = () => showScreen('auth');
-document.getElementById('otpChange').onclick = () => { showScreen('auth'); phoneInput.focus(); };
+document.getElementById('otpChange').onclick = () => { showScreen('auth'); emailInput.focus(); };
 
 const otpCells = [...document.querySelectorAll('.otp-cell')];
 const btnVerify = document.getElementById('btnVerify');
@@ -1134,47 +1178,85 @@ function startResend(){
     if (left <= 0){ clearInterval(resendInterval); otpResend.classList.remove('disabled'); }
   }, 1000);
 }
-otpResend.onclick = () => {
+otpResend.onclick = async () => {
   if (otpResend.classList.contains('disabled')) return;
-  State.tempOtp = String(Math.floor(100000 + Math.random() * 900000));
-  const cb = document.getElementById('codeBanner');
-  cb.dataset.code = State.tempOtp;
-  cb.innerHTML = t('otp.banner') + ' <strong>' + State.tempOtp + '</strong>';
-  startResend();
-  toast(t('toast.copied'), 'ok');
-};
-btnVerify.onclick = async () => {
-  if (otpValue() !== State.tempOtp){ toast(t('err.otp'), 'err'); return; }
-  const phone = State.tempPhone;
+  if (!State.tempEmail || !supabaseAuth) return;
   try {
-    const r = await fetch(API + '/api/find-by-phone', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone: phone })
+    const { error } = await supabaseAuth.auth.signInWithOtp({ email: State.tempEmail });
+    if (error){ toast(error.message, 'err'); return; }
+    document.querySelectorAll('.otp-cell').forEach(c => c.value = '');
+    btnVerify.disabled = true;
+    startResend();
+    toast(t('toast.code_sent'), 'ok');
+  } catch(e){
+    toast(t('toast.server_error'), 'err');
+  }
+};
+
+btnVerify.onclick = async () => {
+  const token = otpValue();
+  if (token.length !== 6){ toast(t('err.otp'), 'err'); return; }
+  const email = State.tempEmail;
+  if (!email){ showScreen('auth'); return; }
+  if (!supabaseAuth){ toast('Supabase не настроен', 'err'); return; }
+
+  btnVerify.disabled = true;
+
+  try {
+    const { data, error } = await supabaseAuth.auth.verifyOtp({
+      email, token, type: 'email'
     });
-    const data = await r.json();
-    if (data.found){
-      const srv = data.user;
-      let localUser = DB.findUserById(srv.id);
-      if (!localUser){
-        localUser = DB.createUser({
-          id: String(srv.id),
-          phone: srv.phone,
-          firstName: srv.first_name,
-          lastName: srv.last_name,
-          username: srv.username,
-          bio: srv.bio || '',
-          avatar: srv.avatar || null
-        });
-      }
-      DB.setSession(localUser.id);
-      bootUser(localUser.id);
-      toast(t('toast.welcome'), 'ok');
+    if (error){
+      toast(t('err.otp'), 'err');
+      btnVerify.disabled = false;
       return;
     }
-  } catch(e){ console.error('check existing', e); }
-  showScreen('nameScreen');
-  document.getElementById('inpName').focus();
+
+    const supabaseUser = data.user;
+    const uid = String(supabaseUser.id);
+
+    // 1) Уже есть локально?
+    let localUser = DB.findUserById(uid);
+    if (localUser){
+      DB.setSession(uid);
+      bootUser(uid);
+      return;
+    }
+
+    // 2) Есть на бэкенде?
+    try {
+      const r = await fetch(API + '/api/find-by-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const d = await r.json();
+      if (d && d.found && d.user){
+        localUser = DB.createUser({
+          id: uid,
+          email: d.user.email || email,
+          firstName: d.user.first_name,
+          lastName: d.user.last_name,
+          username: d.user.username,
+          bio: d.user.bio || '',
+          avatar: d.user.avatar || null,
+          lastSeen: d.user.last_seen ? new Date(d.user.last_seen).getTime() : Date.now()
+        });
+        DB.setSession(uid);
+        bootUser(uid);
+        return;
+      }
+    } catch(e){ console.error('find-by-email', e); }
+
+    // 3) Новый — на экран имени
+    State.tempSupabaseId = uid;
+    showScreen('nameScreen');
+    document.getElementById('inpName').focus();
+  } catch(e){
+    console.error(e);
+    toast(t('toast.server_error'), 'err');
+    btnVerify.disabled = false;
+  }
 };
 
 const inpName = document.getElementById('inpName');
@@ -1215,7 +1297,8 @@ btnCreate.onclick = async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        phone: State.tempPhone,
+        id: State.tempSupabaseId,
+        email: State.tempEmail,
         firstName: name,
         lastName: inpSurname.value.trim() || null,
         username: uname
@@ -1235,12 +1318,12 @@ btnCreate.onclick = async () => {
     }
 
     const srv = data.user;
-    const uidStr = String(srv.id);
+    const uidStr = String(srv.id || State.tempSupabaseId);
     let localUser = DB.findUserById(uidStr);
     if (!localUser){
       localUser = DB.createUser({
         id: uidStr,
-        phone: srv.phone,
+        email: srv.email || State.tempEmail,
         firstName: srv.first_name,
         lastName: srv.last_name,
         username: srv.username,
@@ -1340,7 +1423,7 @@ async function syncChatsFromServer(){
         if (!DB.findUserById(m.id)){
           DB.createUser({
             id: String(m.id),
-            phone: m.phone,
+            email: m.email || null,
             firstName: m.first_name,
             lastName: m.last_name,
             username: m.username,
@@ -1420,7 +1503,7 @@ async function checkNewMessages(){
       if (!DB.findUserById(m.sender_id)){
         DB.createUser({
           id: String(m.sender_id),
-          phone: null,
+          email: null,
           firstName: null,
           lastName: null,
           username: null,
@@ -1652,10 +1735,6 @@ document.querySelectorAll('#meMenu button').forEach(b => {
 
 /* ============================================================
    AVATAR CROPPER (как в Telegram / WhatsApp)
-   - Круглая маска
-   - Тянуть пальцем/мышкой — reposition
-   - Слайдер — zoom
-   - Save — рендерит круглый PNG 400×400 и возвращает blob + dataURL
    ============================================================ */
 function openAvatarCropper(file, onSave){
   const reader = new FileReader();
@@ -1700,7 +1779,6 @@ function openAvatarCropper(file, onSave){
       img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
     }
 
-    /* Drag */
     let dragging = false, sx = 0, sy = 0, otx = 0, oty = 0;
     stage.addEventListener('pointerdown', e => {
       dragging = true;
@@ -1723,7 +1801,6 @@ function openAvatarCropper(file, onSave){
     stage.addEventListener('pointerup', endDrag);
     stage.addEventListener('pointercancel', endDrag);
 
-    /* Zoom (вокруг центра круга) */
     zoom.addEventListener('input', () => {
       const nz = parseFloat(zoom.value) || 1;
       const cx = STAGE/2, cy = STAGE/2;
@@ -1733,10 +1810,8 @@ function openAvatarCropper(file, onSave){
       apply();
     });
 
-    /* Cancel */
     bd.querySelector('#cropCancel').onclick = () => bd.remove();
 
-    /* Save */
     bd.querySelector('#cropSave').onclick = () => {
       const OUT = 400;
       const cv = document.createElement('canvas');
@@ -1801,7 +1876,7 @@ function openProfilePage(){
         </div>
         <label class="lbl" style="padding:0 18px 0">${esc(t('profile.phone'))}</label>
         <div class="set-row" style="padding:0 18px 12px">
-          <input class="field" value="${esc(u.phone||'')}" disabled style="opacity:.6"/>
+          <input class="field" value="${esc(u.email||'')}" disabled style="opacity:.6"/>
         </div>
       </div>
       <div style="padding:0 16px 30px">
@@ -1820,7 +1895,6 @@ function openProfilePage(){
             return;
           }
           openAvatarCropper(f, async (blob, dataURL) => {
-            /* 1) Сразу показываем и сохраняем локально (optimistic) */
             const av = p.querySelector('#pfAvatar');
             av.innerHTML = `<img src="${dataURL}" alt=""/>`;
             DB.updateUser(State.me.id, { avatar: dataURL });
@@ -1828,7 +1902,6 @@ function openProfilePage(){
             updateMePanel();
             renderChats();
 
-            /* 2) Если Supabase настроен — заливаем и подменяем на публичный URL */
             if (SUPABASE_CONFIGURED){
               try {
                 const pub = await uploadAvatarToSupabase(State.me.id, blob);
@@ -1854,7 +1927,6 @@ function openProfilePage(){
       p.querySelector('#pfAvatar').onclick = pickAvatar;
       p.querySelector('#pfAvatarHint').onclick = pickAvatar;
 
-      /* === ИСПРАВЛЕНИЕ КНОПКИ «СОХРАНИТЬ» === */
       const saveBtn = p.querySelector('#pfSave');
       let touched = false, tsX = 0, tsY = 0;
 
@@ -1891,7 +1963,7 @@ function openProfilePage(){
         const t0 = e.changedTouches[0];
         const dx = Math.abs(t0.clientX - tsX);
         const dy = Math.abs(t0.clientY - tsY);
-        if (dx > 10 || dy > 10) return; // это был скролл, а не тап
+        if (dx > 10 || dy > 10) return;
         doSave();
       });
     }
@@ -2087,7 +2159,7 @@ function openUserProfile(userId){
   if (String(userId) === String(State.me.id)){ openProfilePage(); return; }
   const u = DB.findUserById(userId);
   if (!u) return;
-  const phoneAllowed = canSee(State.me.id, u.id, 'phone');
+  const emailAllowed = canSee(State.me.id, u.id, 'phone');
   const bdayAllowed = u.birthday && canSee(State.me.id, u.id, 'bio');
   const stories = u.stories || [];
 
@@ -2121,10 +2193,10 @@ function openUserProfile(userId){
             <div style="color:var(--text2);font-size:12.5px;margin-bottom:4px">${esc(t('profile.bio'))}</div>
             <div>${esc(u.bio)}</div>
           </div>` : ''}
-        ${phoneAllowed && u.phone ? `
+        ${emailAllowed && u.email ? `
           <div class="info-row">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6"/></svg>
-            <span>${esc(u.phone)}</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></svg>
+            <span>${esc(u.email)}</span>
           </div>` : ''}
         ${u.username ? `
           <div class="info-row">
@@ -2226,7 +2298,7 @@ function openActionSheet(){
       setTimeout(() => {
         if (a === 'group') openCreateGroupModal();
         else if (a === 'channel') openCreateChannelModal();
-        else if (a === 'find') openFindByNumber();
+        else if (a === 'find') openFindByEmail();
       }, 120);
     };
   });
@@ -2745,55 +2817,44 @@ function confirmDialog(text, onYes){
     });
 }
 
-function openFindByNumber(){
+function openFindByEmail(){
   openModal(`
     <h2>${esc(t('find.title'))}</h2>
     <p style="color:var(--text2);font-size:13px;margin-bottom:14px">${esc(t('find.hint'))}</p>
-    <div class="phone-row" style="margin-bottom:10px">
-      <button class="country-btn">🇷🇺 +7</button>
-      <input class="field" id="findPhone" type="tel" inputmode="numeric" placeholder="+7 (___) ___-__-__" autofocus/>
-    </div>
+    <input class="field" id="findEmail" type="email" inputmode="email" autocapitalize="off" spellcheck="false" placeholder="name@example.com" autofocus/>
     <div class="err" id="findErr"></div>
     <div id="findResults"></div>
     <button class="btn" id="findBtn" disabled style="margin-top:14px">${esc(t('find.search'))}</button>`,
     b => {
-      const inp = b.querySelector('#findPhone');
+      const inp = b.querySelector('#findEmail');
       const errEl = b.querySelector('#findErr');
       const res = b.querySelector('#findResults');
       const btn = b.querySelector('#findBtn');
-      const setVal = raw => {
-        const cur = inp.selectionStart;
-        const before = digitsOf(inp.value.slice(0, cur)).length;
-        const formatted = formatPhone(raw);
-        inp.value = formatted;
-        let pos = 0, cnt = 0;
-        while (pos < formatted.length && cnt < before){ if (/\d/.test(formatted[pos])) cnt++; pos++; }
-        inp.setSelectionRange(pos, pos);
-      };
-      inp.addEventListener('focus', () => { if (!inp.value) inp.value = '+7 '; });
       inp.addEventListener('input', () => {
-        setVal(inp.value);
-        const ok = phoneValid(inp.value);
+        const v = inp.value.trim();
+        const ok = emailValid(v);
         btn.disabled = !ok;
-        errEl.textContent = inp.value && !ok ? t('err.phone') : '';
+        errEl.textContent = v && !ok ? t('err.phone') : '';
       });
-      inp.addEventListener('keydown', e => { if (e.key === 'Backspace' && digitsOf(inp.value).length <= 1) e.preventDefault(); });
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && emailValid(inp.value)) search();
+      });
 
       const search = async () => {
-        if (!phoneValid(inp.value)) return;
-        const e164 = '+' + digitsOf(inp.value);
+        const em = inp.value.trim().toLowerCase();
+        if (!emailValid(em)) return;
         res.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text2);font-size:14px">Поиск...</div>';
 
-        if (e164 === State.me.phone){
+        if (State.me.email && em === State.me.email.toLowerCase()){
           res.innerHTML = `<div style="text-align:center;padding:16px;color:var(--text2);font-size:14px">${esc(t('find.self'))}</div>`;
           return;
         }
 
         try {
-          const r = await fetch(API + '/api/find-by-phone', {
+          const r = await fetch(API + '/api/find-by-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone: e164 })
+            body: JSON.stringify({ email: em })
           });
           const data = await r.json();
 
@@ -2808,7 +2869,7 @@ function openFindByNumber(){
           if (!user){
             user = DB.createUser({
               id: uidStr,
-              phone: srv.phone,
+              email: srv.email || em,
               firstName: srv.first_name,
               lastName: srv.last_name,
               username: srv.username,
@@ -2837,7 +2898,6 @@ function openFindByNumber(){
         }
       };
       btn.onclick = search;
-      inp.addEventListener('keydown', e => { if (e.key === 'Enter' && phoneValid(inp.value)) search(); });
     });
 }
 
@@ -3013,8 +3073,9 @@ function openSavedChat(){
 }
 
 function doLogout(){
-  confirmDialog(t('confirm.logout'), () => {
+  confirmDialog(t('confirm.logout'), async () => {
     DB.updateUser(State.me.id, { lastSeen: Date.now() });
+    try { if (supabaseAuth) await supabaseAuth.auth.signOut(); } catch(e){}
     DB.clearSession();
     State.me = null; State.activeChat = null;
     clearInterval(window.__hb);
@@ -3032,6 +3093,7 @@ function doDeleteAccount(){
     try {
       await fetch(API + '/api/users/' + State.me.id, { method: 'DELETE' });
     } catch(e){}
+    try { if (supabaseAuth) await supabaseAuth.auth.signOut(); } catch(e){}
     clearInterval(window.__hb);
     clearInterval(window.__pollUpdates);
     clearInterval(window.__pollChats);
